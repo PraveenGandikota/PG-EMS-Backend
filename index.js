@@ -10,7 +10,7 @@ dotenv.config();
 const app = express();
 
 app.use(cors({
-    origin: 'https://employee-management-system-applicatio.netlify.app/',
+    origin: 'https://employee-management-system-applicatio.netlify.app',
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true
 }));
