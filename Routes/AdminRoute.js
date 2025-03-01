@@ -11,8 +11,9 @@ router.post('/adminlogin', (req, res) => {
     const sql = 'SELECT * FROM users WHERE username = ? AND password = ?';
     
     db.query(sql, [req.body.username, req.body.password], (err, result) => {
-        if (err) return res.json({ loginStatus: false, Error: 'Query Error' });
-
+        if (err) {
+            console.error("Database Query Error:", err); return res.json({ loginStatus: false, Error: 'Query Error' });
+        }
         if (result.length > 0) {
             const username = result[0].username;
             const token = jwt.sign({ role: "admin", username: username }, "jwt_secret_key", { expiresIn: "1d" });
