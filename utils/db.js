@@ -18,56 +18,29 @@
 // export default con;
 
 
-// import mysql from 'mysql2';
-// import dotenv from 'dotenv';
-
-// dotenv.config();
-
-// const con = mysql.createConnection({
-//   host: process.env.DB_HOST,
-//   user: process.env.DB_USER,
-//   password: process.env.DB_PASSWORD,
-//   database: process.env.DB_NAME,
-//   port: process.env.DB_PORT,
-//   connectionLimit: 10
-// });
-
-// con.connect((err) => {
-//   if (err) {
-//     console.error('Connection Error:', err.message);
-//   } else {
-//     console.log("Connected to Clever Cloud MySQL Database");
-//   }
-// });  
-
-// export default con;
-
 import mysql from 'mysql2';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
-const pool = mysql.createPool({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    waitForConnections: true,
+const con = mysql.createConnection({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  port: process.env.DB_PORT,
     connectionLimit: 10,  // Adjust based on expected workload
     queueLimit: 0
+
 });
 
-const db = pool.promise(); // Using Promises for better async handling
-
-// Test connection on startup
-pool.getConnection((err, connection) => {
-    if (err) {
-        console.error('Database Connection Error:', err.message);
-    } else {
-        console.log("Connected to MySQL Database");
-        connection.release(); // Release connection back to the pool
-    }
-});
+con.connect((err) => {
+  if (err) {
+    console.error('Connection Error:', err.message);
+  } else {
+    console.log("Connected to Clever Cloud MySQL Database");
+  }
+});  
 
 // Keep-alive mechanism to prevent idle disconnections
 setInterval(async () => {
@@ -79,4 +52,4 @@ setInterval(async () => {
     }
 }, 60000); // Ping every 60 seconds
 
-export default db;
+export default con;
