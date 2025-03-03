@@ -59,10 +59,20 @@ const pool = mysql.createPool({
 
 const db = pool.promise(); // Using Promises for better async handling
 
+// Test connection on startup
+pool.getConnection((err, connection) => {
+    if (err) {
+        console.error('Database Connection Error:', err.message);
+    } else {
+        console.log("Connected to MySQL Database");
+        connection.release(); // Release connection back to the pool
+    }
+});
+
 // Keep-alive mechanism to prevent idle disconnections
 setInterval(async () => {
     try {
-        const [result] = await db.query('SELECT 1');
+        await db.query('SELECT 1');
         console.log("Keep-alive ping successful.");
     } catch (error) {
         console.error("Keep-alive ping failed:", error);
