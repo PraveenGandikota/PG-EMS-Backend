@@ -1,5 +1,6 @@
 import express from 'express'
-import db from '../utils/db.js'
+// import db from '../utils/db.js'
+import con from '../utils/db.js';
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 import multer from 'multer'
@@ -7,12 +8,35 @@ import path from'path'
 
 const router = express.Router()
 
+// router.post('/adminlogin', (req, res) => {
+//     const sql = 'SELECT * FROM users WHERE username = ? AND password = ?';
+    
+//     db.query(sql, [req.body.username, req.body.password], (err, result) => {
+//         if (err) {
+//             console.error("Database Query Error:", err); return res.json({ loginStatus: false, Error: 'Query Error' });
+//         }
+//         console.log("Query Result:", result);
+//         if (result.length > 0) {
+//             const username = result[0].username;
+//             const token = jwt.sign({ role: "admin", username: username }, process.env.JWT_SECRET, { expiresIn: "1d" });
+
+//             res.cookie('token', token);
+//             return res.json({ loginStatus: true });
+//         } else {
+//             return res.json({ loginStatus: false, Error: 'Wrong Email or Password' });
+//         }
+//     });
+
+// });
+
+
 router.post('/adminlogin', (req, res) => {
     const sql = 'SELECT * FROM users WHERE username = ? AND password = ?';
     
-    db.query(sql, [req.body.username, req.body.password], (err, result) => {
+    con.query(sql, [req.body.username, req.body.password], (err, result) => {  // Fix: Use `con` instead of `db`
         if (err) {
-            console.error("Database Query Error:", err); return res.json({ loginStatus: false, Error: 'Query Error' });
+            console.error("Database Query Error:", err);
+            return res.json({ loginStatus: false, Error: 'Query Error' });
         }
         console.log("Query Result:", result);
         if (result.length > 0) {
@@ -25,14 +49,13 @@ router.post('/adminlogin', (req, res) => {
             return res.json({ loginStatus: false, Error: 'Wrong Email or Password' });
         }
     });
-
 });
 
 
 router.get('/category', (req, res) => {
     console.log(req.body);
     const sql = "SELECT * FROM category";
-    db.query(sql, (err, result) => {
+    con.query(sql, (err, result) => {
         if(err) return res.json({Status: false, Error: "Query Error"})
         return res.json({Status: true, Result: result})
     })
@@ -41,7 +64,7 @@ router.get('/category', (req, res) => {
 router.post('/add_category', (req, res) => {
     const sql = "INSERT INTO category (`category_name`, `created_at`) VALUES (?, NOW())";
 
-    db.query(sql, [req.body.category], (err, result) => {
+    con.query(sql, [req.body.category], (err, result) => {
         if (err) {
             return res.json({ Status: false, Error: "Query Error", Details: err.sqlMessage });
         }
@@ -85,7 +108,7 @@ router.post('/add_employee', upload.single('image'), (req, res) => {
             req.body.category_id
         ];
 
-        db.query(sql, [values], (err, result) => {
+        con.query(sql, [values], (err, result) => {
             if (err) return res.json({ Status: false, Error: err });
             return res.json({ Status: true, Message: "Employee added successfully" });
         });
@@ -94,7 +117,7 @@ router.post('/add_employee', upload.single('image'), (req, res) => {
 
 router.get('/employee', (req, res) => {
     const sql = "SELECT * FROM employee";
-    db.query(sql, (err, result) => {
+    con.query(sql, (err, result) => {
         if(err) return res.json({Status: false, Error: "Query Error"})
         return res.json({Status: true, Result: result})
     })
@@ -104,7 +127,7 @@ router.get('/employee', (req, res) => {
 router.get('/employee/:id', (req, res) => {
     const id = req.params.id;
     const sql = "SELECT * FROM employee WHERE id = ?";
-    db.query(sql,[id], (err, result) => {
+    con.query(sql,[id], (err, result) => {
         if(err) return res.json({Status: false, Error: "Query Error"})
         return res.json({Status: true, Result: result})
     })
@@ -123,7 +146,7 @@ router.put('/edit_employee/:id', (req, res) => {
         req.body.address,
         req.body.category_id
     ]
-    db.query(sql,[...values, id], (err, result) => {
+    con.query(sql,[...values, id], (err, result) => {
         if(err) return res.json({Status: false, Error: "Query Error"+err})
         return res.json({Status: true, Result: result})
     })
@@ -137,7 +160,7 @@ router.put('/edit_employee/:id', (req, res) => {
 router.delete('/delete_employee/:id', (req, res) => {
     const id = req.params.id;
     const sql = "delete from employee where id = ?"
-    db.query(sql,[id], (err, result) => {
+    con.query(sql,[id], (err, result) => {
         if(err) return res.json({Status: false, Error: "Query Error"+err})
         return res.json({Status: true, Result: result})
     })
@@ -146,7 +169,7 @@ router.delete('/delete_employee/:id', (req, res) => {
 
 router.get('/admin_count', (req, res) => {
     const sql = "select count(id) as admin from users";
-    db.query(sql, (err, result) => {
+    con.query(sql, (err, result) => {
         if(err) return res.json({Status: false, Error: "Query Error"+err})
         return res.json({Status: true, Result: result})
     })
@@ -155,7 +178,7 @@ router.get('/admin_count', (req, res) => {
 
 router.get('/employee_count', (req, res) => {
     const sql = "select count(id) as employee from employee";
-    db.query(sql, (err, result) => {
+    con.query(sql, (err, result) => {
         if(err) return res.json({Status: false, Error: "Query Error"+err})
         return res.json({Status: true, Result: result})
     })
@@ -163,7 +186,7 @@ router.get('/employee_count', (req, res) => {
 
 router.get('/salary_count', (req, res) => {
     const sql = "select sum(salary) as salaryOFEmp from employee";
-    db.query(sql, (err, result) => {
+    con.query(sql, (err, result) => {
         if(err) return res.json({Status: false, Error: "Query Error"+err})
         return res.json({Status: true, Result: result})
     })
@@ -171,7 +194,7 @@ router.get('/salary_count', (req, res) => {
 
 router.get('/admin_records', (req, res) => {
     const sql = "select * from users"
-    db.query(sql, (err, result) => {
+    con.query(sql, (err, result) => {
         if(err) return res.json({Status: false, Error: "Query Error"+err})
         return res.json({Status: true, Result: result})
     })
@@ -180,7 +203,7 @@ router.get('/admin_records', (req, res) => {
 
 router.get('/profile', (req, res) => {
     const sql = "select * from users";
-    db.query(sql, (err, result) => {
+    con.query(sql, (err, result) => {
         if(err) return res.json({Status: false, Error: "Query Error"+err})
         return res.json({Status: true, Result: result})
     })
