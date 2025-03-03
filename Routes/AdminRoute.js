@@ -8,39 +8,25 @@ import path from'path'
 const router = express.Router()
 
 router.post('/adminlogin', (req, res) => {
-    // const sql = 'SELECT * FROM users WHERE username = ? AND password = ?';
+    const sql = 'SELECT * FROM users WHERE username = ? AND password = ?';
     
-    // db.query(sql, [req.body.username, req.body.password], (err, result) => {
-    //     if (err) {
-    //         console.error("Database Query Error:", err); return res.json({ loginStatus: false, Error: 'Query Error' });
-    //     }
-    //     if (result.length > 0) {
-    //         const username = result[0].username;
-    //         const token = jwt.sign({ role: "admin", username: username }, "jwt_secret_key", { expiresIn: "1d" });
-
-    //         res.cookie('token', token);
-    //         return res.json({ loginStatus: true });
-    //     } else {
-    //         return res.json({ loginStatus: false, Error: 'Wrong Email or Password' });
-    //     }
-    // });
-
-    const sql = 'SELECT * FROM users WHERE username = ?';
-    db.query(sql, [req.body.username], (err, result) => {
-        if (err) return res.json({ loginStatus: false, Error: 'Query Error' });
+    db.query(sql, [req.body.username, req.body.password], (err, result) => {
+        if (err) {
+            console.error("Database Query Error:", err); return res.json({ loginStatus: false, Error: 'Query Error' });
+        }
         if (result.length > 0) {
-            bcrypt.compare(req.body.password, result[0].password, (err, isMatch) => {
-                if (err || !isMatch) return res.json({ loginStatus: false, Error: 'Wrong Email or Password' });
-                const token = jwt.sign({ role: "admin", username: username }, process.env.JWT_SECRET, { expiresIn: "1d" });
-                res.cookie('token', token);
-                return res.json({ loginStatus: true });
-            });
+            const username = result[0].username;
+            const token = jwt.sign({ role: "admin", username: username }, process.env.JWT_SECRET, { expiresIn: "1d" });
+
+            res.cookie('token', token);
+            return res.json({ loginStatus: true });
         } else {
             return res.json({ loginStatus: false, Error: 'Wrong Email or Password' });
         }
     });
 
 });
+
 
 router.get('/category', (req, res) => {
     console.log(req.body);
