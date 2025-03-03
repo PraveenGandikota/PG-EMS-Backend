@@ -25,7 +25,7 @@ const verifyUser = (req, res, next) => {
     if (token) {
         Jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {  
             if (err) return res.json({ Status: false, Error: "Wrong Token" });
-            req.id = decoded.id;
+            req.username = decoded.username;
             req.role = decoded.role;
             next();
         });
