@@ -14,6 +14,7 @@ router.post('/adminlogin', (req, res) => {
         if (err) {
             console.error("Database Query Error:", err); return res.json({ loginStatus: false, Error: 'Query Error' });
         }
+        console.log("Query Result:", result);
         if (result.length > 0) {
             const username = result[0].username;
             const token = jwt.sign({ role: "admin", username: username }, process.env.JWT_SECRET, { expiresIn: "1d" });
