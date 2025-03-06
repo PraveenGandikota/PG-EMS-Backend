@@ -1,6 +1,6 @@
 import express from 'express'
 // import db from '../utils/db.js'
-import con from '../utils/db.js';
+import con from "../utils/db.js"; 
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 import multer from 'multer'
@@ -208,6 +208,7 @@ router.get('/admin_records', (req, res) => {
 //         return res.json({Status: true, Result: result})
 //     })
 // })
+
 router.get('/profile', (req, res) => {
     const token = req.cookies.token;
 
