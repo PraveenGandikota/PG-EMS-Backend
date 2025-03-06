@@ -38,6 +38,10 @@ app.get('/verify', verifyUser, (req, res) => {
     return res.json({ Status: true, role: req.role, id: req.id });
 });
 
+app.get("/api/auth/dashboard", (req, res) => {
+    res.json({ message: "Dashboard endpoint works!" });
+  });
+
 const PORT = process.env.PORT
 
 app.listen(PORT, () => {
