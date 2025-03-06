@@ -201,13 +201,35 @@ router.get('/admin_records', (req, res) => {
 })
 
 
+// router.get('/profile', (req, res) => {
+//     const sql = "select * from users";
+//     con.query(sql, (err, result) => {
+//         if(err) return res.json({Status: false, Error: "Query Error"+err})
+//         return res.json({Status: true, Result: result})
+//     })
+// })
 router.get('/profile', (req, res) => {
-    const sql = "select * from users";
-    con.query(sql, (err, result) => {
-        if(err) return res.json({Status: false, Error: "Query Error"+err})
-        return res.json({Status: true, Result: result})
-    })
-})
+    const token = req.cookies.token;
+
+    if (!token) {
+        return res.json({ Status: false, Error: "No token found" });
+    }
+
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+        if (err) return res.json({ Status: false, Error: "Invalid token" });
+
+        const sql = "SELECT * FROM users WHERE username = ?";
+        db.query(sql, [decoded.username], (err, result) => {
+            if (err) return res.json({ Status: false, Error: "Query Error" + err });
+
+            if (result.length > 0) {
+                return res.json({ Status: true, Result: result[0] }); // Return only the logged-in user
+            } else {
+                return res.json({ Status: false, Error: "User not found" });
+            }
+        });
+    });
+});
 
 
 

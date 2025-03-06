@@ -67,8 +67,8 @@ const con = mysql.createConnection({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   port: process.env.DB_PORT,
-  connectionLimit: 10, 
-  queueLimit: 0
+  // connectionLimit: 10, 
+  // queueLimit: 0
 });
 
 con.connect((err) => {
@@ -79,19 +79,19 @@ con.connect((err) => {
   }
 });  
 
-// Fix: Use `con` instead of `db`
-setInterval(async () => {
-    try {
-        con.query('SELECT 1', (err) => {
-            if (err) {
-                console.error("Keep-alive ping failed:", err);
-            } else {
-                console.log("Keep-alive ping successful.");
-            }
-        });
-    } catch (error) {
-        console.error("Keep-alive ping failed:", error);
-    }
-}, 60000); 
+// // Fix: Use `con` instead of `db`
+// setInterval(async () => {
+//     try {
+//         con.query('SELECT 1', (err) => {
+//             if (err) {
+//                 console.error("Keep-alive ping failed:", err);
+//             } else {
+//                 console.log("Keep-alive ping successful.");
+//             }
+//         });
+//     } catch (error) {
+//         console.error("Keep-alive ping failed:", error);
+//     }
+// }, 60000); 
 
 export default con;
